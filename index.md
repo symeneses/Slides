@@ -28,7 +28,16 @@ Source of Data: [Eurostat General government gross debt - annual data](http://ec
 
 ```r
 gross_debt <- get_eurostat("teina225", time_format = "num")
+kable(gross_debt[1:3,])
 ```
+
+
+
+|unit    |sector |na_item |geo | time|   values|
+|:-------|:------|:-------|:---|----:|--------:|
+|MIO_EUR |S13    |GD      |AT  | 2004| 157159.6|
+|MIO_EUR |S13    |GD      |BE  | 2004| 288324.8|
+|MIO_EUR |S13    |GD      |BG  | 2004|   7526.2|
 
 ---
 
@@ -41,12 +50,19 @@ The function **merge_eurostat_geodata** merges the dataset with geospatial data 
 ```r
 year= 2015
 uni = "PC_GDP"
-gross_debt_year <- gross_debt %>%
-                  filter(time == year & unit == uni)
+gross_debt_year <- gross_debt %>% filter(time == year & unit == uni)
 # merge the filter data with wgeospatial data 
 gross_debt_geo <- merge_eurostat_geodata(gross_debt_year, geocolumn="geo", resolution=60,
      	                    output_class="spdf", all_regions=FALSE)
+kable(gross_debt_year[1:2,])
 ```
+
+
+
+|unit   |sector |na_item |geo | time| values|
+|:------|:------|:-------|:---|----:|------:|
+|PC_GDP |S13    |GD      |AT  | 2015|   85.5|
+|PC_GDP |S13    |GD      |BE  | 2015|  105.8|
 
 ---
 ## Map

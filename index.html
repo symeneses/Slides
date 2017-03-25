@@ -56,7 +56,44 @@ The Shiny application let us select the year and the units, then, the app will s
 Source of Data: <a href="http://ec.europa.eu/eurostat/tgm/table.do?tab=table&amp;plugin=1&amp;language=en&amp;pcode=teina225">Eurostat General government gross debt - annual data</a></p>
 
 <pre><code class="r">gross_debt &lt;- get_eurostat(&quot;teina225&quot;, time_format = &quot;num&quot;)
+kable(gross_debt[1:3,])
 </code></pre>
+
+<table><thead>
+<tr>
+<th align="left">unit</th>
+<th align="left">sector</th>
+<th align="left">na_item</th>
+<th align="left">geo</th>
+<th align="right">time</th>
+<th align="right">values</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">MIO_EUR</td>
+<td align="left">S13</td>
+<td align="left">GD</td>
+<td align="left">AT</td>
+<td align="right">2004</td>
+<td align="right">157159.6</td>
+</tr>
+<tr>
+<td align="left">MIO_EUR</td>
+<td align="left">S13</td>
+<td align="left">GD</td>
+<td align="left">BE</td>
+<td align="right">2004</td>
+<td align="right">288324.8</td>
+</tr>
+<tr>
+<td align="left">MIO_EUR</td>
+<td align="left">S13</td>
+<td align="left">GD</td>
+<td align="left">BG</td>
+<td align="right">2004</td>
+<td align="right">7526.2</td>
+</tr>
+</tbody></table>
 
   </article>
   <!-- Presenter Notes -->
@@ -72,12 +109,40 @@ The function <strong>merge_eurostat_geodata</strong> merges the dataset with geo
 
 <pre><code class="r">year= 2015
 uni = &quot;PC_GDP&quot;
-gross_debt_year &lt;- gross_debt %&gt;%
-                  filter(time == year &amp; unit == uni)
+gross_debt_year &lt;- gross_debt %&gt;% filter(time == year &amp; unit == uni)
 # merge the filter data with wgeospatial data 
 gross_debt_geo &lt;- merge_eurostat_geodata(gross_debt_year, geocolumn=&quot;geo&quot;, resolution=60,
                             output_class=&quot;spdf&quot;, all_regions=FALSE)
+kable(gross_debt_year[1:2,])
 </code></pre>
+
+<table><thead>
+<tr>
+<th align="left">unit</th>
+<th align="left">sector</th>
+<th align="left">na_item</th>
+<th align="left">geo</th>
+<th align="right">time</th>
+<th align="right">values</th>
+</tr>
+</thead><tbody>
+<tr>
+<td align="left">PC_GDP</td>
+<td align="left">S13</td>
+<td align="left">GD</td>
+<td align="left">AT</td>
+<td align="right">2015</td>
+<td align="right">85.5</td>
+</tr>
+<tr>
+<td align="left">PC_GDP</td>
+<td align="left">S13</td>
+<td align="left">GD</td>
+<td align="left">BE</td>
+<td align="right">2015</td>
+<td align="right">105.8</td>
+</tr>
+</tbody></table>
 
   </article>
   <!-- Presenter Notes -->

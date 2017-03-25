@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gross Debt - Leaflet Choropleth</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Gross Debt - Leaflet Choropleth">
+  <meta name="author" content="Sandra Meneses">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Gross Debt - Leaflet Choropleth</h1>
+    <h2>Shiny Application</h2>
+    <p>Sandra Meneses<br/>Student</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Synopsis</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A Choroplet map is printed using data from the eurostat throgh the package of the same name.
+In this case the &quot;General government gross debt - annual data&quot; with code &quot;teina225&quot; was chosen. 
+The Shiny application let us select the year and the units, then, the app will show the map colared per the criteria and show the data as a table in a second panel.</p>
+
+<h2>Data</h2>
+
+<p>The data is download from the eurostat using the function get_eurostat.
+Source of Data: <a href="http://ec.europa.eu/eurostat/tgm/table.do?tab=table&amp;plugin=1&amp;language=en&amp;pcode=teina225">Eurostat General government gross debt - annual data</a></p>
+
+<pre><code class="r">gross_debt &lt;- get_eurostat(&quot;teina225&quot;, time_format = &quot;num&quot;)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Data transforming</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>To print the map the data with year 2015 and the unit &quot;PC_GDP: Porcentage of gross domestic product (GDP)&quot; is filtered.
+The function <strong>merge_eurostat_geodata</strong> merges the dataset with geospatial data as shown in the next example.</p>
+
+<pre><code class="r">year= 2015
+uni = &quot;PC_GDP&quot;
+gross_debt_year &lt;- gross_debt %&gt;%
+                  filter(time == year &amp; unit == uni)
+# merge the filter data with wgeospatial data 
+gross_debt_geo &lt;- merge_eurostat_geodata(gross_debt_year, geocolumn=&quot;geo&quot;, resolution=60,
+                            output_class=&quot;spdf&quot;, all_regions=FALSE)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Map</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The geospatial data is displayed using the leaflet package as shown in code example. </p>
+
+<pre><code class="r">pal &lt;- colorBin(&quot;Spectral&quot;, gross_debt_geo$values, pretty = TRUE)
+country_popup &lt;- paste0(as.character(gross_debt_geo[[&quot;NUTS_ID&quot;]]),&quot; &quot;, gross_debt_geo[[&quot;values&quot;]])
+map = leaflet(data = gross_debt_geo) %&gt;% addTiles() %&gt;% setView(10,55,zoom = 3) %&gt;%
+  addPolygons(fillColor = ~pal(values), stroke = FALSE,
+              popup = country_popup)%&gt;%
+  addLegend(&quot;bottomright&quot;, pal = pal, values = ~values,
+            title = paste0(uni,&quot; &quot;,year))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Shiny App</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Shiny is a web application framework for R which let us turn our analyses into interactive web applications without knowledge of HTML, CSS, or JavaScript.</p>
+
+<p>The Shiny App was built based on <a href="http://shiny.rstudio.com/gallery/superzip-example.html">this example.</a></p>
+
+<p>You can find the final application in this <a href="https://symeneses.shinyapps.io/gross_debt_-_eurostat/">link</a>.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Synopsis'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Data transforming'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Map'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Shiny App'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

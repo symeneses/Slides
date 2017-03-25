@@ -1,0 +1,80 @@
+---
+title       : Gross Debt - Leaflet Choropleth
+subtitle    : Shiny Application
+author      : Sandra Meneses
+job         : Student
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Synopsis
+
+A Choroplet map is printed using data from the eurostat throgh the package of the same name.
+In this case the "General government gross debt - annual data" with code "teina225" was chosen. 
+The Shiny application let us select the year and the units, then, the app will show the map colared per the criteria and show the data as a table in a second panel.
+
+
+```{r message=FALSE, warning=FALSE, echo=FALSE}
+library(knitr)
+library(dplyr)
+library(leaflet)
+library(eurostat)
+opts_chunk$set(echo = TRUE, warning = FALSE,message=FALSE)
+```
+
+## Data
+
+The data is download from the eurostat using the function get_eurostat.
+Source of Data: [Eurostat General government gross debt - annual data](http://ec.europa.eu/eurostat/tgm/table.do?tab=table&plugin=1&language=en&pcode=teina225)
+
+```{r}
+gross_debt <- get_eurostat("teina225", time_format = "num")
+```
+
+---
+
+## Data transforming
+
+To print the map the data with year 2015 and the unit "PC_GDP: Porcentage of gross domestic product (GDP)" is filtered.
+The function **merge_eurostat_geodata** merges the dataset with geospatial data as shown in the next example.
+
+```{r}
+year= 2015
+uni = "PC_GDP"
+gross_debt_year <- gross_debt %>%
+                  filter(time == year & unit == uni)
+# merge the filter data with wgeospatial data 
+gross_debt_geo <- merge_eurostat_geodata(gross_debt_year, geocolumn="geo", resolution=60,
+     	                    output_class="spdf", all_regions=FALSE)
+```
+
+---
+## Map
+
+The geospatial data is displayed using the leaflet package as shown in code example. 
+
+```{r}
+pal <- colorBin("Spectral", gross_debt_geo$values, pretty = TRUE)
+country_popup <- paste0(as.character(gross_debt_geo[["NUTS_ID"]])," ", gross_debt_geo[["values"]])
+map = leaflet(data = gross_debt_geo) %>% addTiles() %>% setView(10,55,zoom = 3) %>%
+  addPolygons(fillColor = ~pal(values), stroke = FALSE,
+              popup = country_popup)%>%
+  addLegend("bottomright", pal = pal, values = ~values,
+            title = paste0(uni," ",year))
+```
+
+---
+
+## Shiny App
+
+Shiny is a web application framework for R which let us turn our analyses into interactive web applications without knowledge of HTML, CSS, or JavaScript.
+
+The Shiny App was built based on [this example.](http://shiny.rstudio.com/gallery/superzip-example.html)
+
+You can find the final application in this [link](https://symeneses.shinyapps.io/gross_debt_-_eurostat/).
+
+
